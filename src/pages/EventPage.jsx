@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router";
 
 import { getEvent } from "../services/events";
 import { createRegistration } from "../services/registrations";
+import { formatDate } from "../utils/formatDate";
 
 // Selve siden for et bestemt event
 export default function EventPage() {
@@ -76,9 +77,6 @@ export default function EventPage() {
     return null;
   }
 
-  // Gør eventets dato klar så vi kan vise den på en pæn måde
-  const date = new Date(event.date);
-
   return (
     <>
       <main className="event-page">
@@ -107,16 +105,7 @@ export default function EventPage() {
               {/* Dato og tidspunkt */}
               <p>
                 <strong>Dato</strong>
-                {date.toLocaleDateString("da-DK", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                })}{" "}
-                kl.{" "}
-                {date.toLocaleTimeString("da-DK", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+                {formatDate(event.date)}
               </p>
 
               {/* Stedet hvor eventet foregår */}
