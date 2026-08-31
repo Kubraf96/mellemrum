@@ -1,22 +1,8 @@
-// Henter de ting vi skal bruge fra React
 import { useEffect, useState } from "react";
-
-// Link bruges til at gå mellem sider
-// useParams bruges til at hente eventets ID fra URL'en
 import { Link, useParams } from "react-router";
 
-// Henter funktionen der gemmer en tilmelding i Supabase
-import { createRegistration } from "../lib/supabase";
-
-// Henter adressen til vores Supabase-projekt fra .env-filen
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-
-// API-nøglen bruges når vi henter data fra Supabase
-const headers = {
-  apikey: import.meta.env.VITE_SUPABASE_APIKEY,
-  "Content-Type": "application/json",
-};
-
+import { getEvent } from "../services/events";
+import { createRegistration } from "../services/registrations";
 
 // Selve siden for et bestemt event
 export default function EventPage() {
@@ -27,33 +13,26 @@ export default function EventPage() {
   // Her gemmer vi det event vi henter fra Supabase
   const [event, setEvent] = useState(null);
 
-  // Her gemmer vi det navn brugeren skriver i formularen
+  // Her gemmer vi navn og mail brugeren skriver i formularen
   const [name, setName] = useState("");
-
-  // Her gemmer vi den email brugeren skriver i formularen
   const [email, setEmail] = useState("");
 
-  //Her gemmer vi en besked til brugeren, fx "Tilmelding sendt!"
+  // Her gemmer vi en besked til brugeren
+  // fx "Tilmelding sendt!"
   const [message, setMessage] = useState("");
 
   // Henter eventet når siden bliver åbnet
   useEffect(() => {
-    // Finder det event der passer til eventets ID
-    async function getEvent() {
-      // Henter eventet fra events-tabellen i Supabase
-      const response = await fetch(`${SUPABASE_URL}/events?id=eq.${eventId}`, {
-        headers,
-      });
-
-      // Laver svaret fra Supabase om til data vi kan bruge
-      const data = await response.json();
+    // Henter det event der passer til eventets ID
+    async function loadEvent() {
+      const data = await getEvent(eventId);
 
       // Gemmer eventet så vi kan vise det på siden
-      setEvent(data[0]);
+      setEvent(data);
     }
 
     // Kører funktionen
-    getEvent();
+    loadEvent();
 
     // Hvis eventId ændrer sig, henter vi det nye event
   }, [eventId]);
@@ -90,7 +69,7 @@ export default function EventPage() {
 
       console.error("Kunne ikke tilmelde:", error);
     }
-  } // <-- DENNE MANGLER HOS DIG
+  }
 
   // Hvis eventet ikke er hentet endnu, viser vi ikke siden
   if (!event) {
@@ -173,7 +152,7 @@ export default function EventPage() {
           </div>
         </section>
 
-        {/* Formular hvor brugeren kan tilmelde sig eventet */}
+        {/* Formular hvor brugeren kan tilmelde sig */}
         <section className="signup-panel">
           <div>
             {/* Lille overskrift over tilmeldingen */}
@@ -209,6 +188,7 @@ export default function EventPage() {
             <button type="submit">Tilmeld mig</button>
           </form>
 
+          {/* Viser besked efter tilmelding */}
           {message && <p className="signup-message">{message}</p>}
         </section>
       </main>
@@ -252,7 +232,6 @@ export default function EventPage() {
         {/* Den nederste del af footeren */}
         <div className="footer-bottom">
           <p className="footer-meta">© 2025 Mellemrum</p>
-
           <p>Aarhus, Danmark</p>
         </div>
       </footer>
