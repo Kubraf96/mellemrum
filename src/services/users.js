@@ -1,9 +1,7 @@
 import { usersUrl, request } from "../lib/supabase";
 
-
 // Finder en bruger ud fra deres email
 export async function getUserByEmail(email) {
-
   // Finder adressen til users-tabellen
   const url = usersUrl();
 
@@ -20,12 +18,18 @@ export async function getUserByEmail(email) {
 
 // Opretter en ny bruger
 export async function createUser(user) {
-  // Finder adressen til users-tabellen
+  // Opretter en ny bruger
   const url = usersUrl();
 
   // Sender den nye bruger til Supabase
-  return request(url, {
+  const data = await request(url, {
     method: "POST",
     body: JSON.stringify(user),
+    headers: {
+      Prefer: "return=representation",
+    },
   });
+
+  // Supabase sender brugeren tilbage som et array
+  return Array.isArray(data) ? data[0] : null;
 }
