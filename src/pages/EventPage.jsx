@@ -63,7 +63,7 @@ export default function EventPage() {
       name,
       email,
       status: "Ny",
-      event_id: event.id,
+      eventId: event.id,
       eventTitle: event.title,
       eventDate: event.date,
       eventLocation: event.venueName,
