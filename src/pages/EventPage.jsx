@@ -73,8 +73,16 @@ async function handleSubmit(eventSubmit) {
     setName("");
     setEmail("");
   } catch (error) {
-    // Viser en besked hvis noget går galt
-    setMessage("Der skete en fejl. Prøv igen.");
+    // Hvis brugeren allerede er tilmeldt dette event
+    if (error.message.includes("registrations_user_event_unique")) {
+      setMessage(
+        "Du er allerede tilmeldt dette event. Har du ikke modtaget en mail? Tryk her for at sende igen.",
+      );
+    } else {
+      // Viser en besked hvis noget andet går galt
+      setMessage("Der skete en fejl. Prøv igen.");
+    }
+
     console.error("Kunne ikke tilmelde:", error);
   }
 }
