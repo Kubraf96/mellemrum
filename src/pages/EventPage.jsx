@@ -28,6 +28,7 @@ export default function EventPage() {
     // Henter det event der passer til eventets ID
     async function loadEvent() {
       const data = await getEvent(eventId);
+      console.log("Event:", data);
 
       // Gemmer eventet så vi kan vise det på siden
       setEvent(data);
@@ -126,22 +127,19 @@ async function handleSubmit(eventSubmit) {
               {/* Stedet hvor eventet foregår */}
               <p>
                 <strong>Sted</strong>
-
                 <span>
-                  {event.venueName}
+                  {event.venues.name}
                   <br />
-                  {event.venueAddress}, {event.venuePostalCode}{" "}
-                  {event.venueCity}
-                  {/* Viser et link til stedet hvis der er en hjemmeside */}
-                  {event.venueWebsite && (
+                  {event.venues.address}, {event.venues.postalCode}{" "}
+                  {event.venues.city}
+                  {event.venues.website && (
                     <>
                       <br />
-                      <a href={event.venueWebsite}>Besøg venue</a>
+                      <a href={event.venues.website}>Besøg venue</a>
                     </>
                   )}
                 </span>
               </p>
-
               {/* Prisen på eventet */}
               <p>
                 <strong>Pris</strong>
