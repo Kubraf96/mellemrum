@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router";
 
 import { getEvent } from "../services/events";
 import { createRegistration } from "../services/registrations";
+import { getUserByEmail, createUser } from "../services/users";
 import { formatDate } from "../utils/formatDate";
 
 // Selve siden for et bestemt event
@@ -53,39 +54,50 @@ export default function EventPage() {
   }, [eventId]);
 
   // Det her sker når brugeren trykker på "Tilmeld mig"
-  async function handleSubmit(eventSubmit) {
-    // Forhindrer siden i at genindlæse når formularen bliver sendt
-    eventSubmit.preventDefault();
+async function handleSubmit(eventSubmit) {
+  eventSubmit.preventDefault();
 
-    // Samler oplysningerne fra formularen
-    // og oplysningerne om det event brugeren har valgt
+  try {
+    // Finder brugeren ud fra email
+    let user = await getUserByEmail(email);
+
+    // Hvis brugeren ikke findes, opretter vi en ny
+    if (!user) {
+      user = await createUser({
+        name,
+        email,
+      });
+    }
+
+    // Opretter tilmeldingen
     const registration = {
-      name,
-      email,
       status: "Ny",
+      userId: user.id,
       eventId: event.id,
-      eventTitle: event.title,
-      eventDate: event.date,
-      eventLocation: event.venueName,
     };
 
-    // Prøver at gemme tilmeldingen i Supabase
-    try {
-      await createRegistration(registration);
+    await createRegistration(registration);
 
-      // Viser en besked til brugeren når tilmeldingen lykkes
-      setMessage("Tak for din tilmelding! Din plads er reserveret.");
+    // Viser en besked til brugeren når tilmeldingen lykkes
+    setMessage("Tak for din tilmelding! Din plads er reserveret.");
 
-      // Tømmer formularen efter tilmelding
-      setName("");
-      setEmail("");
-    } catch (error) {
-      // Viser en besked hvis noget går galt
+    // Tømmer formularen efter tilmelding
+    setName("");
+    setEmail("");
+  } catch (error) {
+    // Hvis brugeren allerede er tilmeldt dette event
+    if (error.message.includes("registrations_user_event_unique")) {
+      setMessage(
+        "Du er allerede tilmeldt dette event. Har du ikke modtaget en mail? Tryk her for at sende igen.",
+      );
+    } else {
+      // Viser en besked hvis noget andet går galt
       setMessage("Der skete en fejl. Prøv igen.");
-
-      console.error("Kunne ikke tilmelde:", error);
     }
+
+    console.error("Kunne ikke tilmelde:", error);
   }
+}
 
   // Hvis eventet ikke er hentet endnu, viser vi ikke siden
 if (loading) {
@@ -134,22 +146,19 @@ if (!event) {
               {/* Stedet hvor eventet foregår */}
               <p>
                 <strong>Sted</strong>
-
                 <span>
-                  {event.venueName}
+                  {event.venues.name}
                   <br />
-                  {event.venueAddress}, {event.venuePostalCode}{" "}
-                  {event.venueCity}
-                  {/* Viser et link til stedet hvis der er en hjemmeside */}
-                  {event.venueWebsite && (
+                  {event.venues.address}, {event.venues.postalCode}{" "}
+                  {event.venues.city}
+                  {event.venues.website && (
                     <>
                       <br />
-                      <a href={event.venueWebsite}>Besøg venue</a>
+                      <a href={event.venues.website}>Besøg venue</a>
                     </>
                   )}
                 </span>
               </p>
-
               {/* Prisen på eventet */}
               <p>
                 <strong>Pris</strong>

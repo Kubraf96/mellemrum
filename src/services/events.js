@@ -6,6 +6,9 @@ export async function listEvents() {
   // Finder adressen til events-tabellen
   const url = eventsUrl();
 
+// Henter venue-oplysningerne
+  url.searchParams.set("select", "*,venues(*)");
+
   // Sorterer events så de højeste ID'er kommer først
   url.searchParams.set("order", "id.desc");
 
@@ -21,6 +24,9 @@ export async function listEvents() {
 export async function getEvent(id) {
   // Finder adressen til events-tabellen
   const url = eventsUrl();
+
+  // Henter venue-oplysningerne
+  url.searchParams.set("select", "*,venues(*)");
 
   // Finder det event hvor ID'et passer
   url.searchParams.set("id", `eq.${id}`);
