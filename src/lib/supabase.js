@@ -25,6 +25,12 @@ function registrationsUrl() {
   return new URL(`${SUPABASE_URL}/registrations`);
 }
 
+// Laver adressen til vores users-tabel
+function usersUrl() {
+  assertSupabaseConfig();
+  return new URL(`${SUPABASE_URL}/users`);
+}
+
 // Denne funktion bruges til at sende og hente data fra Supabase
 async function request(url, options = {}) {
   assertSupabaseConfig();
@@ -55,4 +61,4 @@ async function request(url, options = {}) {
 }
 
 // Gør funktionerne tilgængelige for events.js og registrations.js
-export { eventsUrl, registrationsUrl, request };
+export { eventsUrl, registrationsUrl, usersUrl, request };
