@@ -28,7 +28,6 @@ export default function EventPage() {
     // Henter det event der passer til eventets ID
     async function loadEvent() {
       const data = await getEvent(eventId);
-      console.log("Event:", data);
 
       // Gemmer eventet så vi kan vise det på siden
       setEvent(data);
@@ -55,8 +54,6 @@ async function handleSubmit(eventSubmit) {
         email,
       });
     }
-
-    console.log("Bruger:", user);
 
     // Opretter tilmeldingen
     const registration = {
