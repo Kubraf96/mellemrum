@@ -15,6 +15,12 @@ export default function EventPage() {
   // Her gemmer vi det event vi henter fra Supabase
   const [event, setEvent] = useState(null);
 
+  // Her gemmer vi om eventet stadig bliver hentet
+  const [loading, setLoading] = useState(true);
+
+  // Her gemmer vi en fejlbesked hvis eventet ikke kan hentes
+  const [error, setError] = useState("");
+
   // Her gemmer vi navn og mail brugeren skriver i formularen
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -25,12 +31,20 @@ export default function EventPage() {
 
   // Henter eventet når siden bliver åbnet
   useEffect(() => {
-    // Henter det event der passer til eventets ID
+    // Henter eventet fra Supabase
     async function loadEvent() {
-      const data = await getEvent(eventId);
-
-      // Gemmer eventet så vi kan vise det på siden
-      setEvent(data);
+      try {
+        const data = await getEvent(eventId);
+        // Gemmer eventet i state
+        setEvent(data);
+      } catch (error) {
+        // Gemmer fejlbeskeden i state
+        setError("Eventet kunne ikke hentes.");
+        console.error("Kunne ikke hente event:", error);
+      } finally {
+        // Stopper loading når hentningen er færdig
+        setLoading(false);
+      }
     }
 
     // Kører funktionen
@@ -86,9 +100,17 @@ async function handleSubmit(eventSubmit) {
 }
 
   // Hvis eventet ikke er hentet endnu, viser vi ikke siden
-  if (!event) {
-    return null;
-  }
+if (loading) {
+  return <p>Henter event...</p>;
+}
+
+if (error) {
+  return <p>{error}</p>;
+}
+
+if (!event) {
+  return <p>Eventet blev ikke fundet.</p>;
+}
 
   return (
     <>
