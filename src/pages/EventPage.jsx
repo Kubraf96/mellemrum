@@ -63,13 +63,10 @@ async function handleSubmit(eventSubmit) {
 
     // Hvis brugeren ikke findes, opretter vi en ny
     if (!user) {
-      user = await createUser({
-        name,
-        email,
-      });
+      user = await createUser({ name, email });
     }
 
-    // Opretter tilmeldingen
+    // Opretter tilmeldingen og kobler den til brugeren
     const registration = {
       status: "Ny",
       userId: user.id,
@@ -85,13 +82,11 @@ async function handleSubmit(eventSubmit) {
     setName("");
     setEmail("");
   } catch (error) {
-    // Hvis brugeren allerede er tilmeldt dette event
     if (error.message.includes("registrations_user_event_unique")) {
       setMessage(
         "Du er allerede tilmeldt dette event. Har du ikke modtaget en mail? Tryk her for at sende igen.",
       );
     } else {
-      // Viser en besked hvis noget andet går galt
       setMessage("Der skete en fejl. Prøv igen.");
     }
 
