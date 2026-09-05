@@ -5,6 +5,7 @@ import { getEvent } from "../services/events";
 import { createRegistration } from "../services/registrations";
 import { getUserByEmail, createUser } from "../services/users";
 import { formatDate } from "../utils/formatDate";
+import Footer from "../components/Footer";
 
 // Selve siden for et bestemt event
 export default function EventPage() {
@@ -208,49 +209,7 @@ if (!event) {
           {message && <p className="signup-message">{message}</p>}
         </section>
       </main>
-
-      {/* Footer nederst på siden */}
-      <footer className="site-footer">
-        <div className="footer-top">
-          <div className="footer-intro">
-            {/* Navnet på hjemmesiden */}
-            <p className="footer-brand">
-              mellemrum<span>.</span>
-            </p>
-
-            <p>Udvalgte kulturoplevelser og nye perspektiver på Aarhus.</p>
-          </div>
-
-          {/* Links i footeren */}
-          <nav className="footer-links" aria-label="Footer">
-            <div className="footer-link-group">
-              <p className="footer-heading">Udforsk</p>
-
-              {/* Link til forsiden */}
-              <Link to="/">Events</Link>
-
-              {/* Link til Om-siden */}
-              <Link to="/om">Om Mellemrum</Link>
-            </div>
-
-            <div className="footer-link-group">
-              <p className="footer-heading">For arrangører</p>
-
-              {/* Link til siden med tilmeldinger */}
-              <Link to="/tilmeldinger">Se tilmeldinger</Link>
-
-              {/* Åbner brugerens mailprogram */}
-              <a href="mailto:hej@mellemrum.dk">Kontakt os</a>
-            </div>
-          </nav>
-        </div>
-
-        {/* Den nederste del af footeren */}
-        <div className="footer-bottom">
-          <p className="footer-meta">© 2025 Mellemrum</p>
-          <p>Aarhus, Danmark</p>
-        </div>
-      </footer>
+      <Footer />
     </>
   );
-}
+} 
