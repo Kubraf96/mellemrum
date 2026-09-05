@@ -13,7 +13,10 @@ export default function RegistrationsPage() {
 
   useEffect(() => {
     async function getRegistrations() {
-      const response = await fetch(`${SUPABASE_URL}/registrations?order=createdAt.desc`, { headers });
+const response = await fetch(
+  `${SUPABASE_URL}/registrations?select=*,users(*),events(*)&order=createdAt.desc`,
+  { headers },
+      );
       const data = await response.json();
       setRegistrations(data);
       setRegistrationCount(data.length);
@@ -40,11 +43,15 @@ export default function RegistrationsPage() {
           {registrations.map((registration) => (
             <div className="registration-row" key={registration.id}>
               <div>
-                <strong>{registration.name}</strong>
-                <small>{registration.email}</small>
+                <strong>{registration.users?.name}</strong>
+                <small>{registration.users?.email}</small>
               </div>
-              <span>{registration.eventTitle}</span>
-              <span>{new Date(registration.eventDate).toLocaleDateString("da-DK")}</span>
+              <span>{registration.events?.title}</span>
+              <span>
+                {new Date(registration.events?.date).toLocaleDateString(
+                  "da-DK",
+                )}
+              </span>
               <span className="status">{registration.status}</span>
             </div>
           ))}
