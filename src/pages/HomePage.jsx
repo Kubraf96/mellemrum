@@ -16,9 +16,13 @@ export default function HomePage() {
 
   useEffect(() => {
     async function getEvents() {
-      const response = await fetch(`${SUPABASE_URL}/events?order=date.asc`, {
-        headers,
-      });
+      const response = await fetch(
+        `${SUPABASE_URL}/events?select=*,venues(*)&order=date.asc`,
+        {
+          headers,
+        },
+      );
+
       const data = await response.json();
       setEvents(data);
     }
@@ -33,7 +37,8 @@ export default function HomePage() {
 
   const filteredEvents = events.filter((event) => {
     const searchText =
-      `${event.title} ${event.summary} ${event.venueName}`.toLowerCase();
+      `${event.title} ${event.summary} ${event.venues?.name || ""}`.toLowerCase();
+
     const matchesSearch = searchText.includes(search.toLowerCase());
     const matchesCategory = category === "Alle" || event.category === category;
 
@@ -56,10 +61,12 @@ export default function HomePage() {
       <header className={styles.hero}>
         <p className="eyebrow">Kultur i Aarhus</p>
         <h1>Find plads til noget nyt.</h1>
+
         <p className={styles.heroCopy}>
           Koncerter, talks og workshops samlet ét sted. Find dit næste event, og
           tilmeld dig på få minutter.
         </p>
+
         <a className={styles.heroLink} href="#events">
           Se kommende events ↓
         </a>
@@ -71,6 +78,7 @@ export default function HomePage() {
             <p className="eyebrow dark">Det sker</p>
             <h2>Kommende events</h2>
           </div>
+
           <p>Kuraterede oplevelser i byen – fra små scener til store idéer.</p>
         </section>
 
@@ -84,6 +92,7 @@ export default function HomePage() {
               placeholder="Søg efter titel eller sted"
             />
           </label>
+
           <label>
             Kategori
             <select
@@ -101,14 +110,19 @@ export default function HomePage() {
           {filteredEvents.map((event) => (
             <article className={styles.eventCard} key={event.id}>
               <img src={event.image} alt="" />
+
               <div className={styles.eventCardContent}>
                 <p className="event-category">{event.category}</p>
+
                 <h3>{event.title}</h3>
+
                 <p>{event.summary}</p>
+
                 <div className={styles.eventMeta}>
                   <span>{formatEventDate(event.date)}</span>
-                  <span>{event.venueName}</span>
+                  <span>{event.venues?.name}</span>
                 </div>
+
                 <Link className={styles.cardLink} to={`/events/${event.id}`}>
                   Læs mere
                 </Link>
@@ -117,6 +131,7 @@ export default function HomePage() {
           ))}
         </section>
       </main>
+
       <Footer />
     </>
   );
