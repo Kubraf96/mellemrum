@@ -47,8 +47,8 @@ export default function RegistrationsPage() {
           {registrations.map((registration) => (
             <div className={styles.registrationRow} key={registration.id}>
               <div>
-                <strong>{registration.name}</strong>
-                <small>{registration.email}</small>
+                <strong>{registration.users?.name}</strong>
+                <small>{registration.users?.email}</small>
               </div>
               <span>{registration.eventTitle}</span>
               <span>
