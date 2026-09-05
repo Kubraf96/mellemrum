@@ -6,6 +6,7 @@ import { createRegistration } from "../services/registrations";
 import { getUserByEmail, createUser } from "../services/users";
 import { formatDate } from "../utils/formatDate";
 import Footer from "../components/Footer";
+import styles from "./EventPage.module.css";
 
 // Selve siden for et bestemt event
 export default function EventPage() {
@@ -55,73 +56,73 @@ export default function EventPage() {
   }, [eventId]);
 
   // Det her sker når brugeren trykker på "Tilmeld mig"
-async function handleSubmit(eventSubmit) {
-  eventSubmit.preventDefault();
+  async function handleSubmit(eventSubmit) {
+    eventSubmit.preventDefault();
 
-  try {
-    // Finder brugeren ud fra email
-    let user = await getUserByEmail(email);
+    try {
+      // Finder brugeren ud fra email
+      let user = await getUserByEmail(email);
 
-    // Hvis brugeren ikke findes, opretter vi en ny
-    if (!user) {
-      user = await createUser({ name, email });
+      // Hvis brugeren ikke findes, opretter vi en ny
+      if (!user) {
+        user = await createUser({ name, email });
+      }
+
+      // Opretter tilmeldingen og kobler den til brugeren
+      const registration = {
+        status: "Ny",
+        userId: user.id,
+        eventId: event.id,
+      };
+
+      await createRegistration(registration);
+
+      // Viser en besked til brugeren når tilmeldingen lykkes
+      setMessage("Tak for din tilmelding! Din plads er reserveret.");
+
+      // Tømmer formularen efter tilmelding
+      setName("");
+      setEmail("");
+    } catch (error) {
+      if (error.message.includes("registrations_user_event_unique")) {
+        setMessage(
+          "Du er allerede tilmeldt dette event. Har du ikke modtaget en mail? Tryk her for at sende igen.",
+        );
+      } else {
+        setMessage("Der skete en fejl. Prøv igen.");
+      }
+
+      console.error("Kunne ikke tilmelde:", error);
     }
-
-    // Opretter tilmeldingen og kobler den til brugeren
-    const registration = {
-      status: "Ny",
-      userId: user.id,
-      eventId: event.id,
-    };
-
-    await createRegistration(registration);
-
-    // Viser en besked til brugeren når tilmeldingen lykkes
-    setMessage("Tak for din tilmelding! Din plads er reserveret.");
-
-    // Tømmer formularen efter tilmelding
-    setName("");
-    setEmail("");
-  } catch (error) {
-    if (error.message.includes("registrations_user_event_unique")) {
-      setMessage(
-        "Du er allerede tilmeldt dette event. Har du ikke modtaget en mail? Tryk her for at sende igen.",
-      );
-    } else {
-      setMessage("Der skete en fejl. Prøv igen.");
-    }
-
-    console.error("Kunne ikke tilmelde:", error);
   }
-}
 
   // Hvis eventet ikke er hentet endnu, viser vi ikke siden
-if (loading) {
-  return <p>Henter event...</p>;
-}
+  if (loading) {
+    return <p>Henter event...</p>;
+  }
 
-if (error) {
-  return <p>{error}</p>;
-}
+  if (error) {
+    return <p>{error}</p>;
+  }
 
-if (!event) {
-  return <p>Eventet blev ikke fundet.</p>;
-}
+  if (!event) {
+    return <p>Eventet blev ikke fundet.</p>;
+  }
 
   return (
     <>
-      <main className="event-page">
+      <main className={styles.eventPage}>
         {/* Link tilbage til alle events */}
-        <Link className="back-link" to="/">
+        <Link className={styles.backLink} to="/">
           ← Alle events
         </Link>
 
         {/* Viser information om det valgte event */}
-        <section className="event-detail">
+        <section className={styles.eventDetail}>
           {/* Eventets billede */}
           <img src={event.image} alt="" />
 
-          <div className="event-detail-content">
+          <div className={styles.eventDetailContent}>
             {/* Eventets kategori */}
             <p className="event-category">{event.category}</p>
 
@@ -132,7 +133,7 @@ if (!event) {
             <p className="lead">{event.summary}</p>
 
             {/* Her viser vi de vigtigste detaljer om eventet */}
-            <div className="detail-list">
+            <div className={styles.detailList}>
               {/* Dato og tidspunkt */}
               <p>
                 <strong>Dato</strong>
@@ -170,7 +171,7 @@ if (!event) {
         </section>
 
         {/* Formular hvor brugeren kan tilmelde sig */}
-        <section className="signup-panel">
+        <section className={styles.signupPanel}>
           <div>
             {/* Lille overskrift over tilmeldingen */}
             <p className="eyebrow dark">Tilmelding</p>
@@ -206,10 +207,10 @@ if (!event) {
           </form>
 
           {/* Viser besked efter tilmelding */}
-          {message && <p className="signup-message">{message}</p>}
+          {message && <p className={styles.signupMessage}>{message}</p>}
         </section>
       </main>
       <Footer />
     </>
   );
-} 
+}
