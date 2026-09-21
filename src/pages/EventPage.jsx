@@ -30,11 +30,16 @@ export default function EventPage() {
   // Her gemmer vi en besked til brugeren
   // fx "Tilmelding sendt!"
   const [message, setMessage] = useState("");
+  const [alreadyRegistered, setAlreadyRegistered] = useState(false);
 
   // Henter eventet når siden bliver åbnet
   useEffect(() => {
     // Henter eventet fra Supabase
     async function loadEvent() {
+      const minimumLoadingTime = new Promise((resolve) => {
+        setTimeout(resolve, 700);
+      });
+
       try {
         const data = await getEvent(eventId);
         // Gemmer eventet i state
@@ -44,7 +49,8 @@ export default function EventPage() {
         setError("Eventet kunne ikke hentes.");
         console.error("Kunne ikke hente event:", error);
       } finally {
-        // Stopper loading når hentningen er færdig
+        // Holder skeletonet synligt længe nok til at kunne ses
+        await minimumLoadingTime;
         setLoading(false);
       }
     }
@@ -79,17 +85,18 @@ export default function EventPage() {
 
       // Viser en besked til brugeren når tilmeldingen lykkes
       setMessage("Tak for din tilmelding! Din plads er reserveret.");
+      setAlreadyRegistered(false);
 
       // Tømmer formularen efter tilmelding
       setName("");
       setEmail("");
     } catch (error) {
       if (error.message.includes("registrations_user_event_unique")) {
-        setMessage(
-          "Du er allerede tilmeldt dette event. Har du ikke modtaget en mail? Tryk her for at sende igen.",
-        );
+        setMessage("Du er allerede tilmeldt dette event.");
+        setAlreadyRegistered(true);
       } else {
         setMessage("Der skete en fejl. Prøv igen.");
+        setAlreadyRegistered(false);
       }
 
       console.error("Kunne ikke tilmelde:", error);
@@ -98,7 +105,59 @@ export default function EventPage() {
 
   // Hvis eventet ikke er hentet endnu, viser vi ikke siden
   if (loading) {
-    return <p>Henter event...</p>;
+    return (
+      <main
+        className={styles.eventPage}
+        aria-busy="true"
+        aria-label="Henter event"
+      >
+        <div className={`${styles.skeleton} ${styles.skeletonBackLink}`} />
+
+        <section className={styles.eventDetail}>
+          <div className={`${styles.skeleton} ${styles.skeletonImage}`} />
+
+          <div className={styles.eventDetailContent}>
+            <div className={`${styles.skeleton} ${styles.skeletonCategory}`} />
+            <div className={`${styles.skeleton} ${styles.skeletonTitle}`} />
+            <div
+              className={`${styles.skeleton} ${styles.skeletonTitleShort}`}
+            />
+            <div className={`${styles.skeleton} ${styles.skeletonSummary}`} />
+            <div
+              className={`${styles.skeleton} ${styles.skeletonSummaryShort}`}
+            />
+
+            <div className={styles.skeletonDetails}>
+              <div className={`${styles.skeleton} ${styles.skeletonDetail}`} />
+              <div
+                className={`${styles.skeleton} ${styles.skeletonDetailLong}`}
+              />
+              <div className={`${styles.skeleton} ${styles.skeletonDetail}`} />
+            </div>
+
+            <div className={`${styles.skeleton} ${styles.skeletonParagraph}`} />
+            <div
+              className={`${styles.skeleton} ${styles.skeletonParagraphShort}`}
+            />
+          </div>
+        </section>
+
+        <section className={styles.skeletonSignupPanel}>
+          <div>
+            <div className={`${styles.skeleton} ${styles.skeletonCategory}`} />
+            <div
+              className={`${styles.skeleton} ${styles.skeletonSignupTitle}`}
+            />
+            <div className={`${styles.skeleton} ${styles.skeletonSummary}`} />
+          </div>
+          <div className={styles.skeletonForm}>
+            <div className={`${styles.skeleton} ${styles.skeletonInput}`} />
+            <div className={`${styles.skeleton} ${styles.skeletonInput}`} />
+            <div className={`${styles.skeleton} ${styles.skeletonButton}`} />
+          </div>
+        </section>
+      </main>
+    );
   }
 
   if (error) {
@@ -207,7 +266,23 @@ export default function EventPage() {
           </form>
 
           {/* Viser besked efter tilmelding */}
-          {message && <p className={styles.signupMessage}>{message}</p>}
+          {message && (
+            <div className={styles.signupMessage} role="status">
+              <span className={styles.signupMessageText}>{message}</span>
+              {alreadyRegistered && (
+                <a
+                  className={styles.resendButton}
+                  href={`mailto:hej@mellemrum.dk?subject=${encodeURIComponent(
+                    `Send tilmeldingsmail igen: ${event.title}`,
+                  )}&body=${encodeURIComponent(
+                    `Hej, jeg er allerede tilmeldt ${event.title}, men har ikke modtaget min mail. Min e-mail er ${email}.`,
+                  )}`}
+                >
+                  Tryk her for at sende igen
+                </a>
+              )}
+            </div>
+          )}
         </section>
       </main>
       <Footer />
