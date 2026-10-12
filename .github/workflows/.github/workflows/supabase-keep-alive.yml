@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Tilpas til en tabel, der findes i dit Supabase-projekt
-      PING_TABLE: posts
+      PING_TABLE: events
     steps:
       # VITE_SUPABASE_URL ender på /rest/v1, så tabelnavnet tilføjes her
       - name: Ping Supabase
